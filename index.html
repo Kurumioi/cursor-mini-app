@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tip Calculator</title>
+  <style>
+    :root {
+      --ink: #1c1917;
+      --muted: #78716c;
+      --line: #e7e5e4;
+      --paper: #faf7f2;
+      --card: #ffffff;
+      --accent: #0f766e;
+      --accent-soft: #ccfbf1;
+      --shadow: 0 18px 50px rgba(28, 25, 23, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, #fde68a 0, transparent 28rem),
+        var(--paper);
+      display: grid;
+      place-items: center;
+      padding: 24px 16px;
+    }
+
+    main {
+      width: min(440px, 100%);
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 28px 24px 22px;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 1.7rem;
+      letter-spacing: -0.03em;
+    }
+
+    .lede {
+      margin: 0 0 24px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.82rem;
+      font-weight: 650;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .field {
+      margin-bottom: 20px;
+    }
+
+    .money {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 0 14px;
+      background: #fff;
+    }
+
+    .money:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    .money span {
+      font-size: 1.25rem;
+      color: var(--muted);
+    }
+
+    input[type="number"] {
+      width: 100%;
+      border: 0;
+      outline: none;
+      background: transparent;
+      font: inherit;
+      font-size: 1.35rem;
+      padding: 14px 0;
+      color: var(--ink);
+    }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    input[type="number"] {
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+
+    .tips {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .tips button {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 12px;
+      padding: 12px 0;
+      font: inherit;
+      font-weight: 650;
+      cursor: pointer;
+    }
+
+    .tips button[aria-pressed="true"] {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .tips button:focus-visible,
+    .stepper button:focus-visible {
+      outline: 3px solid var(--accent-soft);
+      outline-offset: 2px;
+    }
+
+    .stepper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .stepper button {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #fff;
+      font-size: 1.4rem;
+      cursor: pointer;
+      color: var(--ink);
+    }
+
+    .stepper input {
+      text-align: center;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      font-size: 1.25rem;
+      padding: 10px;
+    }
+
+    .results {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 8px;
+      padding-top: 8px;
+    }
+
+    .result {
+      background: #f5f5f4;
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .result.primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .result p {
+      margin: 0;
+    }
+
+    .result .name {
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      opacity: 0.75;
+    }
+
+    .result .value {
+      margin-top: 6px;
+      font-size: 1.55rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .note {
+      margin: 14px 2px 0;
+      color: var(--muted);
+      font-size: 0.85rem;
+      min-height: 1.2em;
+    }
+
+    @media (max-width: 420px) {
+      main {
+        padding: 22px 16px 16px;
+      }
+
+      .results {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Tip calculator</h1>
+    <p class="lede">Split the check and see each person’s share update as you type.</p>
+
+    <div class="field">
+      <label for="bill">Bill amount</label>
+      <div class="money">
+        <span aria-hidden="true">$</span>
+        <input id="bill" type="number" inputmode="decimal" min="0" step="0.01" value="84.50" placeholder="0.00">
+      </div>
+    </div>
+
+    <div class="field">
+      <label id="tip-label">Tip percentage</label>
+      <div class="tips" role="group" aria-labelledby="tip-label">
+        <button type="button" data-tip="10">10%</button>
+        <button type="button" data-tip="15">15%</button>
+        <button type="button" data-tip="18" aria-pressed="true">18%</button>
+        <button type="button" data-tip="20">20%</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="people">Number of people</label>
+      <div class="stepper">
+        <button type="button" id="fewer" aria-label="Fewer people">−</button>
+        <input id="people" type="number" inputmode="numeric" min="1" step="1" value="2">
+        <button type="button" id="more" aria-label="More people">+</button>
+      </div>
+    </div>
+
+    <div class="results">
+      <section class="result" aria-live="polite">
+        <p class="name">Tip amount</p>
+        <p class="value" id="tip-amount">$0.00</p>
+      </section>
+      <section class="result primary" aria-live="polite">
+        <p class="name">Total per person</p>
+        <p class="value" id="per-person">$0.00</p>
+      </section>
+    </div>
+    <p class="note" id="note"></p>
+  </main>
+
+  <script>
+    const billInput = document.getElementById("bill");
+    const peopleInput = document.getElementById("people");
+    const tipButtons = document.querySelectorAll(".tips button");
+    const tipAmountEl = document.getElementById("tip-amount");
+    const perPersonEl = document.getElementById("per-person");
+    const noteEl = document.getElementById("note");
+    const fewerBtn = document.getElementById("fewer");
+    const moreBtn = document.getElementById("more");
+
+    let tipPercent = 18;
+
+    const money = (amount) =>
+      new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD"
+      }).format(Number.isFinite(amount) ? amount : 0);
+
+    function readNumber(input) {
+      const value = input.value.trim();
+      if (value === "") return null;
+      const number = Number(value);
+      return Number.isFinite(number) ? number : null;
+    }
+
+    function calculate() {
+      const bill = readNumber(billInput);
+      const people = readNumber(peopleInput);
+      const validBill = bill !== null && bill >= 0;
+      const validPeople = people !== null && Number.isInteger(people) && people >= 1;
+
+      if (!validBill || !validPeople) {
+        tipAmountEl.textContent = "$0.00";
+        perPersonEl.textContent = "$0.00";
+        noteEl.textContent = validBill
+          ? "Enter at least 1 person."
+          : "Enter a bill of $0 or more.";
+        return;
+      }
+
+      const tip = bill * (tipPercent / 100);
+      const total = bill + tip;
+      const each = total / people;
+      const tipEach = tip / people;
+
+      tipAmountEl.textContent = money(tip);
+      perPersonEl.textContent = money(each);
+      noteEl.textContent =
+        people === 1
+          ? "Paying alone."
+          : money(tipEach) + " tip each · " + money(total) + " total.";
+    }
+
+    tipButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        tipPercent = Number(button.dataset.tip);
+        tipButtons.forEach((item) => {
+          item.setAttribute("aria-pressed", String(item === button));
+        });
+        calculate();
+      });
+    });
+
+    function changePeople(delta) {
+      const current = readNumber(peopleInput);
+      const next = Math.max(1, (current === null ? 1 : current) + delta);
+      peopleInput.value = String(Math.floor(next));
+      calculate();
+    }
+
+    fewerBtn.addEventListener("click", () => changePeople(-1));
+    moreBtn.addEventListener("click", () => changePeople(1));
+    billInput.addEventListener("input", calculate);
+    peopleInput.addEventListener("input", calculate);
+
+    calculate();
+  </script>
+</body>
+</html>
